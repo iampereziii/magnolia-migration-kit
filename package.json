@@ -1,0 +1,13 @@
+{
+  "name": "magnolia-migration-kit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Claude Code kit for AI-assisted Magnolia content migrations",
+  "engines": { "node": ">=22.19" },
+  "scripts": {
+    "mm": "node --env-file-if-exists=.env src/cli.js",
+    "test": "node --test"
+  },
+  "dependencies": { "yaml": "^2.5.0" }
+}

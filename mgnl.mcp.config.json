@@ -1,0 +1,12 @@
+{
+  "magnolia": {
+    "baseUrl": "${MGNL_HOST}",
+    "username": "${MGNL_USER}",
+    "password": "${MGNL_PASSWORD}",
+    "authorInstance": "${MGNL_AUTHOR_CONTEXT}",
+    "publicInstances": []
+  },
+  "plugins": {
+    "@magnolia-ai/mcp-magnolia-api-plugin": { "version": "latest" }
+  }
+}

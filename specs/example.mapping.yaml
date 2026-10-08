@@ -1,0 +1,36 @@
+# Mapping spec: one file per A -> B pair. Claude drafts it; a human approves it.
+# Client specs belong in the client's repo (or specs/local/, which is gitignored), not in this kit.
+
+name: example-standard-to-article   # used for the out/<name>/ folder
+
+from:
+  template: my-module:pages/standard   # template A (mgnl:template on the page)
+  workspace: website                   # default: website
+  root: /                              # where to look for pages; default: /
+
+to:
+  template: my-module:pages/article    # template B
+
+# Page-level property changes, applied to the page node itself.
+page:
+  rename:                  # old name: new name (value and type are kept)
+    subtitle: abstract
+  set:                     # name: value (always written)
+    hideInNav: false
+  drop:                    # properties to delete
+    - legacyLayout
+
+# Component rules, keyed by the component's current mgnl:template.
+components:
+  my-module:components/text: keep          # unchanged
+  my-module:components/oldTeaser:
+    template: my-module:components/teaser  # template swap
+    rename:
+      linkTarget: link
+
+# What to do with a component whose template is not listed above:
+#   exception (default): the whole page goes to the exception queue and is not written
+#   ignore: leave the component as it is
+onUnmapped: exception
+
+# Not supported by the nodes-api writer (needs a move): renaming or moving areas.

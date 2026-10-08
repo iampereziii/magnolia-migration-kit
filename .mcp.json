@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "magnolia-dev": {
+      "command": "npx",
+      "args": ["-y", "@magnolia-ai/mcp-dev-server"]
+    }
+  }
+}
