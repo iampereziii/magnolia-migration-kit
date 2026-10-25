@@ -5,7 +5,7 @@
 // nodes, so node identifiers are always kept. Anything that needs a move (area renames,
 // restructuring) is out of scope here and goes to the exception queue.
 
-import { propValue } from './client.js';
+import { propValue, inferType } from './client.js';
 
 const TEMPLATE = 'mgnl:template';
 
@@ -44,8 +44,9 @@ function applyRules(node, rules, ops, reasons) {
   if (!rules) return;
   for (const [from, to] of Object.entries(rules.rename ?? {})) {
     const p = node.props[from];
-    if (!p) continue;
-    if (node.props[to] && from !== to) {
+    // A rename to the same name would set and then delete the property, so skip it.
+    if (!p || from === to) continue;
+    if (node.props[to]) {
       reasons.push(`rename ${from}->${to} would overwrite existing ${to} at ${node.path}`);
       continue;
     }
@@ -54,7 +55,7 @@ function applyRules(node, rules, ops, reasons) {
   }
   for (const [name, value] of Object.entries(rules.set ?? {})) {
     const values = Array.isArray(value) ? value : [value];
-    ops.push({ op: 'set', path: node.path, name, type: typeOf(values[0]), multiple: Array.isArray(value), values });
+    ops.push({ op: 'set', path: node.path, name, type: inferType(values[0]), multiple: Array.isArray(value), values });
   }
   for (const name of rules.drop ?? []) {
     if (node.props[name]) ops.push({ op: 'delete-prop', path: node.path, name });
@@ -63,12 +64,6 @@ function applyRules(node, rules, ops, reasons) {
 
 function setOp(path, name, type, value) {
   return { op: 'set', path, name, type, multiple: false, values: [value] };
-}
-
-function typeOf(v) {
-  if (typeof v === 'boolean') return 'Boolean';
-  if (typeof v === 'number') return Number.isInteger(v) ? 'Long' : 'Double';
-  return 'String';
 }
 
 // Visit descendants of a page, but not sub-pages: each page is planned on its own.

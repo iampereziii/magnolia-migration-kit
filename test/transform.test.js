@@ -76,3 +76,13 @@ test('summary counts', () => {
   assert.equal(s.ops, 2);
   assert.deepEqual(s.exceptionReasons, { 'unmapped component m:c/x': 1 });
 });
+
+test('a rename to the same name is skipped, so the property is not deleted', () => {
+  const p = normalize({
+    name: 'p', path: '/p', type: 'mgnl:page',
+    properties: [prop('mgnl:template', 'm:pages/standard'), prop('title', 'Hi')], nodes: [],
+  });
+  const plan = planPage(p, { ...spec, page: { rename: { title: 'title' } } });
+  assert.equal(plan.status, 'clean');
+  assert.deepEqual(plan.ops.map((o) => `${o.op} ${o.name}`), ['set mgnl:template']);
+});

@@ -2,7 +2,7 @@
 // Usage: node src/cli.js <inventory|plan|apply|validate> --spec <file> [--limit N] [--go] [--writer nodes-api]
 // Prints short summaries only. Full detail goes to out/<spec>/ files, which Claude should not read in bulk.
 
-import { mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { MagnoliaClient, propValue } from './client.js';
@@ -63,6 +63,9 @@ async function plan() {
   if (!existsSync(join(outDir, 'inventory.json'))) await inventory();
   let targets = load('inventory.json').filter((p) => p.template === spec.from.template || p.template === spec.to.template);
   if (args.limit) targets = targets.slice(0, Number(args.limit));
+  // apply writes every file in plan/, so clear old plans: apply must match this dry run only.
+  rmSync(join(outDir, 'plan'), { recursive: true, force: true });
+  mkdirSync(join(outDir, 'plan'), { recursive: true });
   const plans = [];
   for (const t of targets) {
     const page = await client.getNode(ws, t.path, PAGE_DEPTH);

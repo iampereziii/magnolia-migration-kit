@@ -6,7 +6,7 @@ export const nodesApiWriter = {
   name: 'nodes-api',
 
   async applyPlan(plan, client, workspace) {
-    // Group consecutive "set" ops per node into one POST to keep the call count down.
+    // Group all "set" ops for the same node into one POST to keep the call count down.
     const byNode = new Map();
     const deletes = [];
     for (const op of plan.ops) {
